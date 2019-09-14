@@ -42,7 +42,18 @@ Filters.prototype = {
                 if (url) {
                     document.location = $selectedOption.data('url');
                 } else if (querysetLookup) {
-                    document.location = '?' + querysetLookup + '=' + $selectedOption.val();
+                    var params = {};
+                    if (document.location.search) {
+                        params = JSON.parse('{"' + document.location.search.substring(1).replace(/&/g, '","').replace(/=/g, '":"') + '"}',
+                            function (key, value) {
+                                return key === "" ? value : decodeURIComponent(value)
+                            });
+                    }
+                    params[querysetLookup] = $selectedOption.val();
+                    document.location.search = Object.keys(params).map(function (k) {
+                        return encodeURIComponent(k) + '=' + encodeURIComponent(params[k])
+                    }).join('&');
+
                 }
             });
         });
